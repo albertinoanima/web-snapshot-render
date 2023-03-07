@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<HTML>
+   <head>
+      <title>Todos Wesites</title>
+      <style>
+         * {
+            margin: 0;
+            padding: 0;
+         }
+
+         #websites-cards {
+            display: flex; 
+            flex-wrap: wrap;
+            width: auto;
+            height: auto;
+            padding: 20px;
+            background-color: #dddddd;
+            margin-left: auto;
+            margin-right: auto;
+         }
+
+         #body-button {
+            width: 242px; 
+            margin-top: 20px;
+            margin-left: auto; 
+            margin-right: auto;
+         }
+
+         #show-websites-btn {
+            width: 240px;
+            height: 50px;
+            outline: none;
+            font-size: 12pt;
+            font-weight: 700;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            box-shadow: 2px 4px 0.5 black;
+            background-color: bisque;
+         }
+
+         .anchor {
+            width: 350px; 
+            height: 300px; 
+            margin: auto;
+            padding: 8px;
+            margin-bottom: 20px;
+            border: 4px solid #6d9e45;
+         }
+
+         .card {
+            width: 100%;
+            height: 100%;
+         }
+      </style>
+   </head>
+   <body>
+      <div id="websites-cards">
+      </div>
+
+
+      <script>
+         window.onload = () => {
+            // setTimeout(() => {
+               resquest();
+            // }, 2000);
+         }
+
+         const setImageBackground = (index, siteName, host) => {
+            return new Promise((resolve, reject) => {
+               const finalUrl = "http://" + siteName;
+
+               const promise = fetch(host + "/?url=" + finalUrl, { method: "GET" });
+               promise.then(response => {
+                  return response.json();
+               }).then (finalRes => {
+                  if (finalRes.data.toString() !== "") {
+                     const string64BitImageSrc = `data:image/png;base64, ${finalRes.data}`;
+                     resolve(string64BitImageSrc);
+                  } else {
+                     reject({ message: "Something went wrong" })
+                  }
+               }).catch(error => {
+                  reject({ message: "Something went wrong" })
+               });
+            });
+         }
+
+         const resquest = async () => {
+            const websites = ["janete.co.mz", "osinformais.com", "jolivillas.com", "peasantsforclimatejustice.org", "arene.org.mz", "maquinas.co.mz", "parquemaputo.gov.mz", "biofund.org.mz", "plataforma.biofund.org.mz", "makelinks.africa", "sunsociedadecivil.org.mz", "maputofilm.com", "proler.gov.mz", "camoes-ccpmocambique.co.mz", "feeltheheat.co.mz", "www.cga.co.mz", "anima.co.mz", "tecnicaindustrial.co.mz"];
+            
+            for (let i = 0; i < websites.length; i++) {
+               const websitesCards = document.getElementById("websites-cards");
+
+               const anchor = document.createElement("a");
+               anchor.className = "anchor";
+               anchor.id = "anchor" + i;
+               anchor.target = "_black";
+
+               const card = document.createElement("div");
+               card.id = "card-" + i;
+               card.className = "card";
+
+               card.innerHTML = "a carregar...";
+               card.style.color = "black";
+               card.style.textAlign = "center";
+               card.style.fontStyle = "intalic";
+               card.style.fontWeight = 500;
+
+               anchor.appendChild(card);
+               websitesCards.appendChild(anchor);
+            }
+
+            const host = window.location.origin + "/snapshot";
+            websites.map(async (siteName, index) => {
+               const card = document.getElementById("card-" + index);
+
+               try {
+                  const imageSrcObj = await setImageBackground(index, siteName, host);
+
+                  const anchor = document.getElementById("anchor" + index);
+                  anchor.href = "http://" + siteName;
+
+                  card.innerHTML = "";
+                  card.style.backgroundImage = "url('"+ imageSrcObj + "')";
+                  card.style.backgroundSize = "400px 350px";
+
+                  const span = document.createElement("span");
+                  span.innerText = siteName;
+                  span.style.fontWeight = "800";
+                  span.style.padding = "5px 10px 5px 10px";
+                  span.style.backgroundColor = "black";
+                  span.style.color = "white";
+                  card.appendChild(span);
+               } catch (error) {
+                  card.innerHTML = "Ocorreu um erro ao acessar o website.";
+                  card.style.color = "black";
+                  card.style.textAlign = "center";
+                  card.style.fontStyle = "intalic";
+                  card.style.fontWeight = 600;
+               }
+            });
+         }
+      </script>
+   </body>
+</HTML>
